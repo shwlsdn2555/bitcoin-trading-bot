@@ -1,97 +1,113 @@
 # Futures Swing Portfolio Alert Bot
 
-This is an alert-only bot. It does not accept exchange API keys and does not place orders.
+A Python-based crypto swing trading research and alert system designed to generate rule-based futures signals, backtest portfolio strategies, manage risk, and send Discord alerts.
 
-The current default strategy is the researched multi-coin 4H swing portfolio model:
+> This project is currently an **alert-only system**.  
+> It does not accept exchange API keys and does not place orders automatically.
 
-- Symbols: BTC, ETH, SOL, BNB, XRP
-- Signal: 4H Donchian 10 breakout
-- Trend filter: EMA50 / EMA200
-- Strength filter: ADX > 20
-- Stop: ATR x 2
-- Target: ATR x 4
-- Max hold: 24 four-hour candles, about 4 days
-- Default risk: 3%
-- Max positions: 2
-- Max same-side positions: 1
-- Monthly risk reduction: halve risk after -6%, stop new alerts after -10%
+## Project Overview
 
-## Local quick start
+This project was created to research and automate a multi-asset crypto swing trading strategy.
 
-1. Create a virtual environment.
-2. Install dependencies:
+The system monitors major crypto assets, applies trend and strength filters, calculates ATR-based risk levels, generates trading alerts, and tracks the outcome of previously generated signals.
 
-```powershell
-pip install -r requirements.txt
-```
+The current default model is a multi-coin 4H swing portfolio strategy.
 
-3. Copy `.env.example` to `.env` and set `DISCORD_WEBHOOK_URL`.
-4. Test Discord:
+## Strategy Logic
 
-```powershell
-python swing_portfolio_alert_bot.py --test-discord
-```
+### Markets
 
-5. Check the strategy once:
+- BTC/USDT
+- ETH/USDT
+- SOL/USDT
+- BNB/USDT
+- XRP/USDT
 
-```powershell
-python swing_portfolio_alert_bot.py --once
-```
+### Entry Logic
 
-6. Run continuously:
+The strategy uses:
 
-```powershell
-python swing_portfolio_alert_bot.py
-```
+- 4H Donchian Channel breakout
+- EMA50 / EMA200 trend filter
+- ADX trend-strength filter
+- ATR-based volatility measurement
 
-## Useful commands
+### Risk Management
 
-Run one scan without keeping the process open:
+- Stop Loss: ATR × 2
+- Target: ATR × 4
+- Maximum holding period: 24 × 4H candles
+- Default risk per signal: 3%
+- Maximum open positions: 2
+- Maximum same-side positions: 1
+- Monthly risk reduction after -6%
+- Stop generating new alerts after -10% monthly drawdown
 
-```powershell
-python swing_portfolio_alert_bot.py --once
-```
+## Key Features
 
-## Alert fields
+- Multi-asset market monitoring
+- Rule-based signal generation
+- Portfolio-level risk controls
+- ATR-based dynamic stop-loss and take-profit levels
+- ADX trend-strength filtering
+- Position exposure limits
+- Discord alert integration
+- Signal result tracking
+- Backtesting tools
+- Parameter optimization
+- Research utilities
 
-Each signal alert includes symbol, direction, entry zone, ATR-based stop, ATR-based target, max hold period, ADX, default risk, stable-mode notional, aggressive-mode notional, and portfolio exposure limits.
+## Alert System
 
-## Added quant filters
+Each signal alert contains:
 
-The live bot now checks:
+- Symbol
+- Long / Short direction
+- Entry zone
+- Stop-loss level
+- Target level
+- Maximum holding period
+- ADX value
+- Suggested risk level
+- Stable-mode position size
+- Aggressive-mode position size
+- Portfolio exposure limits
 
-- ADX trend strength
-- ATR-based dynamic TP/SL levels
-- Max open positions
-- Max same-side positions
-- Max total exposure
-- Monthly risk reduction
-- Monthly new-alert stop
+The system also tracks previously generated alerts.
 
-It also tracks open alerts after they are sent. If target, stop, or time expiry occurs, it writes the result to:
+When a target, stop, or time expiration occurs, the result is recorded in:
 
 ```text
 logs/swing_alert_results.csv
-```
+Project Structure
+swing_portfolio_alert_bot.py
+    Main portfolio monitoring and Discord alert bot.
 
-## Next upgrade path
+risk_research_backtest.py
+    Research and risk-focused backtesting.
 
-1. Stabilize alert-only operation.
-2. Add backtesting and walk-forward reports.
-3. Track every alert result automatically.
-4. Add Vultr monitoring and restart behavior.
-5. Only after enough evidence, consider a separate auto-trading module.
+portfolio_swing_backtest.py
+    Portfolio-level strategy backtesting.
 
-## Backtest
+backtest_alert_strategy.py
+    Backtesting utilities for the alert strategy.
 
-Run the portfolio research backtest:
+optimize_strategy.py
+    Strategy parameter optimization.
 
-```powershell
-python risk_research_backtest.py
-```
+alert_only_futures_bot.py
+    Futures alert generation logic.
 
-Run the broader portfolio parameter grid:
+requirements.txt
+    Python dependencies.
 
-```powershell
-python portfolio_swing_backtest.py
-```
+.env.example
+    Example environment configuration.
+
+vultr-alert-bot.service
+    Example Linux service configuration for server deployment.
+Local Setup
+1. Create a virtual environment
+Create and activate a Python virtual environment.
+2. Install dependencies
+pip install -r requirements.txt
