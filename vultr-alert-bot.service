@@ -1,0 +1,17 @@
+[Unit]
+Description=BTC Futures Alert Only Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/alert-bot
+EnvironmentFile=/opt/alert-bot/.env
+ExecStart=/opt/alert-bot/venv/bin/python /opt/alert-bot/swing_portfolio_alert_bot.py
+Restart=always
+RestartSec=10
+User=alertbot
+Group=alertbot
+
+[Install]
+WantedBy=multi-user.target
