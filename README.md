@@ -1,113 +1,129 @@
-# Futures Swing Portfolio Alert Bot
+# Quant Trading Systems
 
-A Python-based crypto swing trading research and alert system designed to generate rule-based futures signals, backtest portfolio strategies, manage risk, and send Discord alerts.
+This repository is a long-term quant trading research workspace for two separate systems:
 
-> This project is currently an **alert-only system**.  
-> It does not accept exchange API keys and does not place orders automatically.
+1. Crypto quant trading system for Bitcoin and major coins.
+2. Stock quant trading system for US and Korean markets.
 
-## Project Overview
+The current production-ready program is the crypto Discord alert bot. The stock system is planned as a separate research track and will be built step by step.
 
-This project was created to research and automate a multi-asset crypto swing trading strategy.
+All live-facing code is **alert-only by default**. It does not accept exchange API keys and does not place orders automatically.
 
-The system monitors major crypto assets, applies trend and strength filters, calculates ATR-based risk levels, generates trading alerts, and tracks the outcome of previously generated signals.
+## Project Roadmap
 
-The current default model is a multi-coin 4H swing portfolio strategy.
+Start here:
 
-## Strategy Logic
+```text
+PROJECT_ROADMAP.md       Full long-term roadmap for crypto and stock systems
+CRYPTO_SYSTEM_PLAN.md    Crypto strategy plan, universe, and research order
+STOCK_SYSTEM_PLAN.md     US/Korea stock strategy plan and build order
+DAILY_UPDATE_LOG.md      Daily manual/automatic progress journal
+RESULTS_SUMMARY.md       Current validated research results
+```
 
-### Markets
+## Current Live Strategy
 
-- BTC/USDT
-- ETH/USDT
-- SOL/USDT
-- BNB/USDT
-- XRP/USDT
+The current crypto live candidate is a multi-coin 4H swing portfolio strategy.
 
-### Entry Logic
+- Symbols: BTC/USDT, ETH/USDT, SOL/USDT, BNB/USDT, XRP/USDT
+- Timeframe: 4h
+- Signal: Donchian 10 breakout
+- Trend filter: EMA50 / EMA200
+- Strength filter: ADX > 20
+- Stop loss: ATR x 2
+- Target: ATR x 4
+- Maximum holding period: 24 four-hour candles, about 4 days
 
-The strategy uses:
+Backtest reference from 2023-04-28 to 2026-04-28:
 
-- 4H Donchian Channel breakout
-- EMA50 / EMA200 trend filter
-- ADX trend-strength filter
-- ATR-based volatility measurement
+- Monthly compound return: about 6.0%
+- Total return: about 714%
+- Max drawdown: about -23.0%
+- Worst month: about -10.5%
+- Trades: 357
+- Profit factor: about 1.48
 
-### Risk Management
+These are historical research results, not guaranteed future returns.
 
-- Stop Loss: ATR × 2
-- Target: ATR × 4
-- Maximum holding period: 24 × 4H candles
-- Default risk per signal: 3%
-- Maximum open positions: 2
-- Maximum same-side positions: 1
-- Monthly risk reduction after -6%
-- Stop generating new alerts after -10% monthly drawdown
+## Alert Contents
 
-## Key Features
-
-- Multi-asset market monitoring
-- Rule-based signal generation
-- Portfolio-level risk controls
-- ATR-based dynamic stop-loss and take-profit levels
-- ADX trend-strength filtering
-- Position exposure limits
-- Discord alert integration
-- Signal result tracking
-- Backtesting tools
-- Parameter optimization
-- Research utilities
-
-## Alert System
-
-Each signal alert contains:
+Discord alerts include:
 
 - Symbol
-- Long / Short direction
+- Long or short direction
 - Entry zone
 - Stop-loss level
 - Target level
 - Maximum holding period
-- ADX value
+- ADX and ATR context
 - Suggested risk level
-- Stable-mode position size
-- Aggressive-mode position size
+- Stable and aggressive sizing references
 - Portfolio exposure limits
 
-The system also tracks previously generated alerts.
-
-When a target, stop, or time expiration occurs, the result is recorded in:
+Signal outcomes are tracked in:
 
 ```text
 logs/swing_alert_results.csv
-Project Structure
-swing_portfolio_alert_bot.py
-    Main portfolio monitoring and Discord alert bot.
+```
 
-risk_research_backtest.py
-    Research and risk-focused backtesting.
+## Code Files
 
-portfolio_swing_backtest.py
-    Portfolio-level strategy backtesting.
+```text
+swing_portfolio_alert_bot.py   Main 4H portfolio monitoring and Discord alert bot
+risk_research_backtest.py      Risk-focused portfolio backtesting
+portfolio_swing_backtest.py    Portfolio-level strategy backtesting
+backtest_alert_strategy.py     Original alert-strategy backtesting
+optimize_strategy.py           Parameter optimization research
+alert_only_futures_bot.py      Earlier alert-only futures bot
+requirements.txt               Python dependencies
+.env.example                   Example environment configuration
+vultr-alert-bot.service        Example Linux systemd service
+RESULTS_SUMMARY.md             Current research summary
+QUANT_RESEARCH_CHARTER.md      Research rules and acceptance gates
+AUTO_UPDATE_BACKLOG.md         Research backlog for automatic updates
+GITHUB_SETUP.md                GitHub, laptop, and server workflow notes
+```
 
-backtest_alert_strategy.py
-    Backtesting utilities for the alert strategy.
+## Development Tracks
 
-optimize_strategy.py
-    Strategy parameter optimization.
+Crypto track:
+- Maintain the current Vultr Discord alert bot.
+- Improve backtesting reports.
+- Expand major coin universe only after validation.
+- Promote live defaults only with backtest evidence.
 
-alert_only_futures_bot.py
-    Futures alert generation logic.
+Stock track:
+- Start with US ETFs and indexes.
+- Add Korean index/ETF logic separately.
+- Use daily and weekly systems before any shorter timeframe.
+- Compare every strategy against its benchmark.
 
-requirements.txt
-    Python dependencies.
+## Local Setup
 
-.env.example
-    Example environment configuration.
-
-vultr-alert-bot.service
-    Example Linux service configuration for server deployment.
-Local Setup
-1. Create a virtual environment
-Create and activate a Python virtual environment.
-2. Install dependencies
+```bash
+python -m venv venv
+venv\Scripts\activate
 pip install -r requirements.txt
+copy .env.example .env
+```
+
+Edit `.env` and set your real Discord webhook URL.
+
+## Server Update
+
+On the Vultr server:
+
+```bash
+cd /opt/alert-bot
+git pull
+./venv/bin/pip install -r requirements.txt
+systemctl restart alert-bot
+systemctl status alert-bot
+```
+
+## Safety Notes
+
+- Do not commit `.env`.
+- Do not commit Discord webhook URLs.
+- Do not add exchange API keys to this alert-only version.
+- Every live strategy change should be backed by a backtest first.

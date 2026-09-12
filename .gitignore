@@ -182,6 +182,8 @@ cython_debug/
 .env.*
 !.env.example
 logs/
+data_3y/
+state_*.json
 risk_research_results/
 portfolio_results/
 portfolio_data/
