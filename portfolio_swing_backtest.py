@@ -259,6 +259,130 @@ def write_csv(rows, path):
         writer.writerows(rows)
 
 
+def profit_factor(returns):
+    wins = [r for r in returns if r > 0]
+    losses = [r for r in returns if r <= 0]
+    return sum(wins) / abs(sum(losses)) if losses else None
+
+
+def compound_return(returns):
+    return math.prod([1 + r for r in returns]) - 1 if returns else 0.0
+
+
+def build_equity_curve(rows):
+    equity = 1.0
+    peak = 1.0
+    curve = []
+    for row in sorted(rows, key=lambda r: r["exit_ts"]):
+        equity = float(row["equity_after"])
+        peak = max(peak, equity)
+        curve.append({
+            "exit_time_utc": row["exit_time_utc"],
+            "symbol": row["symbol"],
+            "side": row["side"],
+            "reason": row["reason"],
+            "equity_return": row["equity_return"],
+            "equity": equity,
+            "drawdown": equity / peak - 1,
+        })
+    return curve
+
+
+def period_report(rows, freq):
+    if not rows:
+        return []
+    df = pd.DataFrame(rows)
+    df["exit_dt"] = pd.to_datetime(df["exit_time_utc"], utc=True)
+    reports = []
+    for period, group in df.set_index("exit_dt").sort_index().groupby(pd.Grouper(freq=freq)):
+        if group.empty:
+            continue
+        returns = group["equity_return"].astype(float).tolist()
+        if freq == "ME":
+            period_label = period.strftime("%Y-%m")
+        elif freq == "QE":
+            period_label = f"{period.year}-Q{((period.month - 1) // 3) + 1}"
+        else:
+            period_label = period.strftime("%Y")
+        reports.append({
+            "period": period_label,
+            "start_utc": group["exit_time_utc"].iloc[0],
+            "end_utc": group["exit_time_utc"].iloc[-1],
+            "trades": len(group),
+            "return": compound_return(returns),
+            "win_rate": sum(1 for r in returns if r > 0) / len(returns),
+            "profit_factor": profit_factor(returns),
+            "best_trade": max(returns),
+            "worst_trade": min(returns),
+        })
+    return reports
+
+
+def symbol_report(rows):
+    if not rows:
+        return []
+    reports = []
+    by_symbol = {}
+    for row in rows:
+        by_symbol.setdefault(row["symbol"], []).append(row)
+    for symbol, symbol_rows in sorted(by_symbol.items()):
+        returns = [float(r["equity_return"]) for r in symbol_rows]
+        long_rows = [r for r in symbol_rows if r["side"] == "LONG"]
+        short_rows = [r for r in symbol_rows if r["side"] == "SHORT"]
+        reports.append({
+            "symbol": symbol,
+            "trades": len(symbol_rows),
+            "return_contribution": sum(returns),
+            "compounded_return": compound_return(returns),
+            "win_rate": sum(1 for r in returns if r > 0) / len(returns),
+            "profit_factor": profit_factor(returns),
+            "long_trades": len(long_rows),
+            "short_trades": len(short_rows),
+            "avg_position_fraction": sum(float(r["position_fraction"]) for r in symbol_rows) / len(symbol_rows),
+        })
+    return sorted(reports, key=lambda r: r["return_contribution"], reverse=True)
+
+
+def rolling_monthly_report(rows):
+    monthly = period_report(rows, "ME")
+    if not monthly:
+        return []
+    returns = [float(row["return"]) for row in monthly]
+    equity = []
+    current = 1.0
+    for r in returns:
+        current *= 1 + r
+        equity.append(current)
+
+    rolling = []
+    for i, row in enumerate(monthly):
+        last_3 = returns[max(0, i - 2):i + 1]
+        last_6 = returns[max(0, i - 5):i + 1]
+        window_equity = equity[max(0, i - 2):i + 1]
+        peak = max(window_equity) if window_equity else equity[i]
+        rolling.append({
+            "period": row["period"],
+            "month_return": row["return"],
+            "equity": equity[i],
+            "rolling_3_month_return": compound_return(last_3),
+            "rolling_6_month_return": compound_return(last_6),
+            "rolling_3_month_drawdown": equity[i] / peak - 1 if peak else 0.0,
+        })
+    return rolling
+
+
+def write_research_reports(rows, out_dir, prefix):
+    if not rows:
+        return
+    out_dir = Path(out_dir)
+    write_csv(build_equity_curve(rows), out_dir / f"{prefix}_equity_curve.csv")
+    write_csv(period_report(rows, "ME"), out_dir / f"{prefix}_monthly_report.csv")
+    write_csv(period_report(rows, "QE"), out_dir / f"{prefix}_quarterly_report.csv")
+    write_csv(period_report(rows, "YE"), out_dir / f"{prefix}_yearly_report.csv")
+    write_csv(symbol_report(rows), out_dir / f"{prefix}_symbol_report.csv")
+    write_csv(rolling_monthly_report(rows), out_dir / f"{prefix}_rolling_monthly_report.csv")
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--symbols", default=",".join(SYMBOLS))
@@ -290,6 +414,7 @@ def main():
     grid, best, best_closed = run_grid(trades)
     write_csv(grid, OUT_DIR / "portfolio_grid.csv")
     write_csv(best_closed, OUT_DIR / "best_portfolio_trades.csv")
+    write_research_reports(best_closed, OUT_DIR, "best_portfolio")
     (OUT_DIR / "best_summary.json").write_text(json.dumps(best, indent=2), encoding="utf-8")
     print(json.dumps(best, indent=2))
     print("Top 10")

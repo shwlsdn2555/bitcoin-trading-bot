@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 
 import backtest_alert_strategy as bt
-from portfolio_swing_backtest import DATA_DIR, symbol_key, write_csv
+from portfolio_swing_backtest import DATA_DIR, symbol_key, write_csv, write_research_reports
 
 
 SYMBOLS = ["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "XRP/USDT"]
@@ -283,6 +283,7 @@ def main():
     rows = sorted(rows, key=lambda r: (r["max_drawdown"] > -0.30, r["monthly_compound"], r["profit_factor"] or 0), reverse=True)
     write_csv(rows, OUT_DIR / "risk_research_grid.csv")
     write_csv(best_closed, OUT_DIR / "best_risk_trades.csv")
+    write_research_reports(best_closed, OUT_DIR, "best_risk")
     (OUT_DIR / "best_risk_summary.json").write_text(json.dumps(rows[0], indent=2), encoding="utf-8")
     print(json.dumps(rows[:20], indent=2))
 

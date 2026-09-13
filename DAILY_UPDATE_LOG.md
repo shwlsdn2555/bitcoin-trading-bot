@@ -7,6 +7,23 @@ Every manual or automatic update should add a new entry at the top.
 ## 2026-09-13
 
 Focus:
+- Start Priority 1 from the research backlog: improve crypto portfolio reporting.
+
+Changed:
+- Added reusable research report helpers to `portfolio_swing_backtest.py`.
+- Connected `portfolio_swing_backtest.py` to export best portfolio equity curve, monthly, quarterly, yearly, symbol, and rolling monthly reports.
+- Connected `risk_research_backtest.py` to export the same report set for the best risk configuration.
+
+Current status:
+- The next crypto backtest run will produce GitHub-readable CSV reports under ignored result folders.
+- Validated headline metrics in `RESULTS_SUMMARY.md` remain unchanged until the improved backtest is run.
+
+Next:
+- Run the improved backtests on Vultr, then summarize the new report files and update `RESULTS_SUMMARY.md` if the metrics are confirmed.
+
+## 2026-09-13 Earlier
+
+Focus:
 - Report current automation progress.
 - Make the Vultr daily update script safer for the current WinSCP-based deployment path.
 
