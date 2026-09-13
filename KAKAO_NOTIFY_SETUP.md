@@ -44,13 +44,14 @@ Add these only to `.env`, never to `.env.example` with real secrets:
 ```text
 KAKAO_NOTIFY_ENABLED=true
 KAKAO_ACCESS_TOKEN=your_kakao_access_token
+KAKAO_REFRESH_TOKEN=your_kakao_refresh_token
+KAKAO_REST_API_KEY=your_rest_api_key
 ```
 
-Optional later:
+Only needed when Client Secret is enabled for the REST API key:
 
 ```text
-KAKAO_REST_API_KEY=your_rest_api_key
-KAKAO_REFRESH_TOKEN=your_refresh_token
+KAKAO_CLIENT_SECRET=your_client_secret
 ```
 
 ## Test
@@ -78,5 +79,6 @@ logs/kakao_notify.log
 
 - Do not paste Kakao tokens into screenshots or chat.
 - Do not commit `.env`.
-- Access tokens expire. A refresh-token flow should be added before relying on Kakao notifications long term.
+- Access tokens expire. When `KAKAO_REFRESH_TOKEN` and `KAKAO_REST_API_KEY` are set, the helper refreshes expired access tokens and updates `.env`.
+- If Kakao returns a new refresh token, the helper updates `KAKAO_REFRESH_TOKEN` in `.env` too.
 - If Kakao setup becomes too heavy, Discord can be used for the same start/end notifications immediately.

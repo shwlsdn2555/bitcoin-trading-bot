@@ -7,6 +7,23 @@ Every manual or automatic update should add a new entry at the top.
 ## 2026-09-13
 
 Focus:
+- Add KakaoTalk access token auto-refresh support.
+
+Changed:
+- Updated `scripts/kakao_notify.py` to refresh expired access tokens using `KAKAO_REFRESH_TOKEN`.
+- Added automatic `.env` updates for new access tokens and newly rotated refresh tokens.
+- Documented `KAKAO_REFRESH_TOKEN`, `KAKAO_REST_API_KEY`, and optional `KAKAO_CLIENT_SECRET`.
+
+Current status:
+- Manual KakaoTalk send works from the Vultr server.
+- The next deployment can handle expired access tokens when refresh credentials are present in `/opt/alert-bot/.env`.
+
+Next:
+- Push this commit, pull it on Vultr, and run another Kakao test message.
+
+## 2026-09-13 Earlier
+
+Focus:
 - Connect Vultr daily server cron to KakaoTalk start/end notifications.
 
 Changed:
