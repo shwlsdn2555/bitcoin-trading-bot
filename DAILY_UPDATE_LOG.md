@@ -7,6 +7,26 @@ Every manual or automatic update should add a new entry at the top.
 ## 2026-09-13
 
 Focus:
+- Report current automation progress.
+- Make the Vultr daily update script safer for the current WinSCP-based deployment path.
+
+Changed:
+- Updated `scripts/daily_server_update.sh` so GitHub pull failure does not stop the whole daily job.
+- Updated `VULTR_OPERATIONS.md` to document the WinSCP fallback and GitHub-authentication limitation.
+
+Current status:
+- Vultr bot is running under `alert-bot.service`.
+- Codex daily automation is active for 17:00 local scheduled research.
+- GitHub remains the source of truth, but Vultr Git authentication is not yet reliable.
+- WinSCP upload is the current practical server update method.
+
+Next:
+- Add the cron entry on Vultr for `scripts/daily_server_update.sh`.
+- Later, fix GitHub authentication from Vultr using a cleaner SSH or token setup outside noVNC.
+
+## 2026-09-13 Earlier
+
+Focus:
 - Continue the GitHub + Vultr operating model.
 - Add repeatable server setup and daily server update files.
 

@@ -56,7 +56,8 @@ scripts/daily_server_update.sh
 
 It does this:
 
-- Pulls the latest GitHub code.
+- Pulls the latest GitHub code when server Git authentication is available.
+- Continues with the files currently on the server if GitHub pull fails.
 - Installs updated Python requirements.
 - Runs available crypto research backtests.
 - Restarts the alert bot.
@@ -87,6 +88,8 @@ If the server uses UTC and you want Korea time 17:00, use 08:00 UTC:
 The daily server script pulls from GitHub by default. It does not push automatically yet.
 
 Automatic push should be added only after SSH key authentication is configured safely. Do not put GitHub passwords or tokens in `.env`.
+
+If GitHub authentication is not configured yet, upload changed files with WinSCP and keep the daily server script running. The script will skip or log failed GitHub pulls instead of stopping the whole update.
 
 ## Useful Commands
 
