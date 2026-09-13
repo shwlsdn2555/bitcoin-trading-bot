@@ -74,6 +74,8 @@ logs/swing_alert_results.csv
 swing_portfolio_alert_bot.py   Main 4H portfolio monitoring and Discord alert bot
 risk_research_backtest.py      Risk-focused portfolio backtesting
 monthly_loss_defense_research.py Monthly reduce/stop research for weak-month defense
+symbol_contribution_pruning_research.py Research all 3/4/5-symbol subsets without changing live defaults
+walk_forward_validation.py   Train/holdout validation for preselected stable-profile candidates
 portfolio_swing_backtest.py    Portfolio-level strategy backtesting
 backtest_alert_strategy.py     Original alert-strategy backtesting
 optimize_strategy.py           Parameter optimization research

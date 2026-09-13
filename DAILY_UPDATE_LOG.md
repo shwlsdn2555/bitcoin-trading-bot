@@ -4,6 +4,108 @@ This file is the GitHub-visible progress journal for the long-term quant trading
 
 Every manual or automatic update should add a new entry at the top.
 
+## 2026-09-14 Pre-update notice
+
+Selected backlog item:
+- P8: Walk-forward and out-of-sample validation of the P1 stable monthly-loss-defense candidate and the P2 stable symbol-pruning candidate.
+
+Hypothesis:
+- Candidates selected on the full history should retain their risk-adjusted advantage when selected on 2023-2024 data and evaluated only on the later 2025-2026 holdout period.
+
+Usage and decision:
+- Codex five-hour usage: 4% used.
+- Codex weekly usage: 30% used.
+- Work will proceed; both values are below the automation safety limits.
+- Kakao notification is not configured locally, so this notice is recorded here.
+
+## 2026-09-14 P8 result
+
+Focus:
+- Validate the P1 stable monthly-loss-defense and P2 stable symbol-pruning candidates on an untouched later period.
+
+Changed:
+- Added `walk_forward_validation.py`.
+- Updated `README.md` with the validation script.
+- Wrote ignored holdout results to `risk_research_results/walk_forward_validation.csv` and `walk_forward_validation_summary.json`.
+
+Method and tests:
+- Ran bundled-Python syntax validation: `python -m py_compile walk_forward_validation.py`.
+- Generated the fixed 4H signal set once, selected the candidates using 2023-04-28 through 2024-12-31, and compared them only over the 2025-01-01 through 2026-04-28 holdout.
+- Corrected the validation script so monthly compound uses each split's actual duration rather than the full 36-month reference period, then reran the check.
+
+Holdout metrics:
+- Stable five-symbol baseline: monthly compound 4.81%, MDD -19.85%, worst month -7.57%, PF 1.51, 141 trades.
+- P1 monthly-loss-defense candidate: monthly compound 4.56%, MDD -19.85%, worst month -7.58%, PF 1.49, 141 trades. It lost 0.25 percentage points of monthly compound and 0.02 PF with no MDD improvement.
+- P2 ETH/BNB/XRP pruning candidate: monthly compound 4.38%, MDD -18.35%, worst month -5.45%, PF 1.53, 122 trades. It improved MDD by 1.50 percentage points and PF by 0.02, but lost 0.43 percentage points of monthly compound.
+
+Decision:
+- Rejected both candidates on holdout. Neither meets the requirement to improve an important weakness without a material new weakness.
+- Keep the stable five-symbol universe and its documented -8% reduce / -12% stop controls.
+- `RESULTS_SUMMARY.md` remains unchanged because no new candidate was validated.
+
+Risks:
+- This is one fixed holdout split, not a complete rolling walk-forward study. It is sufficient to reject these promotions but not to prove all variants are poor.
+- Alert-only safety and all live defaults remain unchanged.
+
+Post-update notice:
+- Kakao notification is not configured locally, so this result notice is recorded here.
+
+Next:
+- Continue in priority order with P3: compare volatility regime filters, keeping `skip_extreme` as the stable-only baseline.
+
+## 2026-09-13 Pre-update notice
+
+Selected backlog item:
+- P2: Symbol contribution pruning.
+
+Hypothesis:
+- Removing one or two consistently weak symbols may improve portfolio drawdown or profit factor without relying on a single coin or one favorable period.
+
+Usage and decision:
+- Codex five-hour usage: 40% used.
+- Codex weekly usage: 29% used.
+- Work will proceed; both values are below the automation safety limits.
+- Kakao notification is not configured locally, so this notice is recorded here.
+
+## 2026-09-13 P2 result
+
+Focus:
+- Test P2 symbol contribution pruning against the frozen balanced and stable five-symbol baselines.
+
+Hypothesis:
+- Removing weak contributors may improve drawdown or profit factor without materially reducing monthly compound, trade count, or year-by-year robustness.
+
+Changed:
+- Added `symbol_contribution_pruning_research.py`.
+- Updated `README.md` with the research script.
+- Wrote ignored research outputs under `risk_research_results/`: full subset grid, year-by-year results, and balanced/stable symbol contribution reports.
+
+Tests:
+- Ran bundled-Python syntax validation: `python -m py_compile symbol_contribution_pruning_research.py`.
+- Ran the P2 backtest across every 3-, 4-, and 5-symbol subset using the 2023-04-28 to 2026-04-28 4H data.
+- Applied the documented balanced and stable profiles, then checked each subset over calendar years 2023 through 2026-to-date.
+
+Metrics:
+- Balanced five-symbol baseline: monthly compound 6.00%, MDD -23.02%, worst month -10.52%, PF 1.48, 357 trades; all four calendar-year slices were positive.
+- Best balanced robustness candidate excluded BTC: monthly compound 5.96%, MDD -23.13%, worst month -10.51%, PF 1.51, 333 trades; all four yearly slices were positive. PF improved, but neither return nor drawdown improved materially.
+- Stable five-symbol baseline: monthly compound 4.40%, MDD -19.85%, worst month -12.18%, PF 1.46, 338 trades; all four calendar-year slices were positive.
+- Stable ETH/BNB/XRP candidate: monthly compound 4.18%, MDD -18.35%, worst month -11.59%, PF 1.53, 282 trades; three of four yearly slices were positive, with the worst year -2.88%.
+
+Decision:
+- No live universe change. The balanced candidate is rejected as an insufficient improvement.
+- The stable ETH/BNB/XRP subset is a needs-more-testing research candidate: it improves MDD by 1.50 percentage points and PF by 0.08, but loses 0.22 percentage points of monthly compound and has one negative year.
+- `RESULTS_SUMMARY.md` remains unchanged because no pruning result is validated for promotion.
+
+Risks:
+- Selecting subsets from this same history can overfit. The candidate has lower trade count and must pass walk-forward or holdout validation before any user-approved live consideration.
+- Alert-only safety and current live defaults remain unchanged.
+
+Post-update notice:
+- Kakao notification is not configured locally, so this result notice is recorded here.
+
+Next:
+- Run P8 walk-forward / holdout validation for the stable ETH/BNB/XRP candidate and the full stable universe; if it fails, keep the five-symbol universe and continue to P3.
+
 ## 2026-09-13
 
 Focus:
