@@ -4,6 +4,27 @@ This file is the GitHub-visible progress journal for the long-term quant trading
 
 Every manual or automatic update should add a new entry at the top.
 
+## 2026-09-13
+
+Focus:
+- Continue the GitHub + Vultr operating model.
+- Add repeatable server setup and daily server update files.
+
+Changed:
+- Added `scripts/server_bootstrap.sh`.
+- Added `scripts/daily_server_update.sh`.
+- Added `VULTR_OPERATIONS.md`.
+- Updated `README.md` to point to the new Vultr workflow.
+
+Current status:
+- GitHub remains the source of truth.
+- Vultr is the preferred always-on runtime for the alert bot and scheduled jobs.
+- GitHub Actions is intentionally deferred to reduce complexity.
+
+Next:
+- Configure a fresh or reactivated Vultr server from `VULTR_OPERATIONS.md`.
+- Add safe GitHub SSH authentication later if automatic push from Vultr becomes necessary.
+
 ## 2026-09-12
 
 Focus:

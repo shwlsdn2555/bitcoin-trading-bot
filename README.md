@@ -19,6 +19,7 @@ CRYPTO_SYSTEM_PLAN.md    Crypto strategy plan, universe, and research order
 STOCK_SYSTEM_PLAN.md     US/Korea stock strategy plan and build order
 DAILY_UPDATE_LOG.md      Daily manual/automatic progress journal
 RESULTS_SUMMARY.md       Current validated research results
+VULTR_OPERATIONS.md      Server setup, bot service, and daily update workflow
 ```
 
 ## Current Live Strategy
@@ -78,6 +79,8 @@ alert_only_futures_bot.py      Earlier alert-only futures bot
 requirements.txt               Python dependencies
 .env.example                   Example environment configuration
 vultr-alert-bot.service        Example Linux systemd service
+scripts/server_bootstrap.sh    Fresh Vultr server setup script
+scripts/daily_server_update.sh Daily Vultr pull, backtest, and restart script
 RESULTS_SUMMARY.md             Current research summary
 QUANT_RESEARCH_CHARTER.md      Research rules and acceptance gates
 AUTO_UPDATE_BACKLOG.md         Research backlog for automatic updates
@@ -120,6 +123,8 @@ git pull
 systemctl restart alert-bot
 systemctl status alert-bot
 ```
+
+For a fresh server, follow `VULTR_OPERATIONS.md`.
 
 ## Safety Notes
 
