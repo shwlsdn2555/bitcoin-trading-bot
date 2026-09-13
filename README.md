@@ -20,6 +20,7 @@ STOCK_SYSTEM_PLAN.md     US/Korea stock strategy plan and build order
 DAILY_UPDATE_LOG.md      Daily manual/automatic progress journal
 RESULTS_SUMMARY.md       Current validated research results
 VULTR_OPERATIONS.md      Server setup, bot service, and daily update workflow
+KAKAO_NOTIFY_SETUP.md    KakaoTalk start/end notification setup
 ```
 
 ## Current Live Strategy
@@ -81,6 +82,7 @@ requirements.txt               Python dependencies
 vultr-alert-bot.service        Example Linux systemd service
 scripts/server_bootstrap.sh    Fresh Vultr server setup script
 scripts/daily_server_update.sh Daily Vultr pull, backtest, and restart script
+scripts/kakao_notify.py        KakaoTalk notification helper
 RESULTS_SUMMARY.md             Current research summary
 QUANT_RESEARCH_CHARTER.md      Research rules and acceptance gates
 AUTO_UPDATE_BACKLOG.md         Research backlog for automatic updates

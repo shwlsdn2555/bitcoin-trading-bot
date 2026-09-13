@@ -7,6 +7,25 @@ Every manual or automatic update should add a new entry at the top.
 ## 2026-09-13
 
 Focus:
+- Prepare KakaoTalk start/end notifications for daily quant updates.
+
+Changed:
+- Added `scripts/kakao_notify.py`.
+- Added `KAKAO_NOTIFY_SETUP.md`.
+- Added Kakao notification environment placeholders to `.env.example`.
+- Updated `README.md` to list the Kakao setup and helper script.
+
+Current status:
+- Kakao notification code is ready but disabled until Kakao Developers access token setup is complete.
+- Codex automation can report usage before work, but Kakao delivery requires a configured Kakao token.
+
+Next:
+- Configure Kakao Developers `talk_message` permission and access token.
+- Then enable `KAKAO_NOTIFY_ENABLED=true` in `.env` and test `scripts/kakao_notify.py`.
+
+## 2026-09-13 Earlier
+
+Focus:
 - Document the confirmed lower-drawdown crypto candidate from the improved risk research output.
 
 Changed:
