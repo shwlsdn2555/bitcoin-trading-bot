@@ -1,99 +1,256 @@
-# Quant Trading System Auto-Update Backlog
+# Profitability Improvement Auto-Update Backlog
 
-Goal: build two verified quant trading research and alert systems:
+Goal: run a small, repeatable research loop that tries to improve the alert-only quant system over time.
 
-1. Crypto futures alert system for Bitcoin and major coins.
-2. US/Korea stock quant system for indexes, ETFs, and later selected stocks.
+The automation should not chase one lucky backtest. It should search for durable improvements, reject weak ideas quickly, and keep the live bot conservative unless evidence is strong.
 
-Current live direction:
-- Alert-only, no exchange API keys, no automated orders.
-- Multi-coin 4H swing strategy.
-- Researched baseline: BTC, ETH, SOL, BNB, XRP; Donchian 10 breakout; EMA50/EMA200 trend filter; ADX > 20; stop ATR x 2; target ATR x 4; max hold 24 four-hour candles.
-- Current preferred risk profile: risk 3% per trade, max 2 open positions, max 1 same-side position, max 1.5x notional per position, max 3x total exposure, halve risk after monthly -6%, stop new alerts after monthly -10%.
-- Backtest reference: monthly compound about 6.0%, max drawdown about -23.0% over 2023-04-28 to 2026-04-28.
+## Current Baselines
 
-## Operating Principles
+### Live Baseline: Balanced Growth
 
-1. Do not add automated order placement unless explicitly requested later.
-2. Prefer robust, explainable rules over fragile curve-fitted parameters.
-3. Every strategy change must be backed by a backtest before being proposed for live alerts.
-4. Never optimize only for monthly return. Always report max drawdown, worst month, profit factor, trade count, month win rate, and year-by-year stability.
-5. Treat monthly 8% as an aggressive research target, not a default live target, unless drawdown remains acceptable.
-6. Use public, checkable ideas only. Do not claim access to private systems built by other users.
-7. Keep live defaults conservative unless a new configuration improves return and drawdown together.
+- Universe: BTC/USDT, ETH/USDT, SOL/USDT, BNB/USDT, XRP/USDT
+- Timeframe: 4h
+- Signal: Donchian 10 breakout
+- Trend filter: EMA50 / EMA200
+- Strength filter: ADX > 20
+- Stop/target: ATR x 2 / ATR x 4
+- Max hold: 24 four-hour bars
+- Risk: 3% per trade
+- Exposure: max 2 positions, max 1 same-side, max 1.5x per position, max 3x total
+- Monthly controls: reduce at -6%, stop at -10%
+- Reference result: monthly compound about 6.0%, MDD about -23.0%, worst month about -10.5%, month win rate about 64.9%, 357 trades, PF about 1.48
 
-## Acceptance Gates
+### Conservative Baseline: Stable Alternative
 
-A strategy can be considered for live alert defaults only if it meets most of these:
+- Same signal and universe as the live baseline
+- Volatility filter: skip extreme ATR percentile
+- Risk: 2.5% per trade
+- Monthly controls: reduce at -8%, stop at -12%
+- Reference result: monthly compound about 4.40%, MDD about -19.85%, worst month about -12.18%, month win rate about 70.3%, 338 trades, PF about 1.46
 
-- Minimum 100 trades over a 3-year backtest, unless it is explicitly a low-frequency satellite strategy.
-- Profit factor above 1.30.
-- Monthly compound return above 4.0% for balanced mode, or above 7.0% for aggressive mode.
-- Max drawdown under 30% for balanced mode, or under 45% for aggressive mode.
-- Worst month better than -15% for balanced mode.
-- Positive or at least non-catastrophic performance across multiple calendar years.
-- No obvious single-symbol dependency.
+## Daily Research Loop
 
-## Research Queue
+Each daily automatic update should process one bounded task:
 
-### Priority 1: Portfolio Risk Improvement
+1. Select one hypothesis from the queue below.
+2. State the expected benefit before editing code.
+3. Make the smallest implementation needed to test the idea.
+4. Run syntax checks and the relevant backtest.
+5. Compare metrics against the live and stable baselines.
+6. Mark the result as accepted, rejected, or needs-more-testing.
+7. Update `DAILY_UPDATE_LOG.md` with the evidence.
+8. Update `RESULTS_SUMMARY.md` only for validated accepted results.
+9. Send one daily KakaoTalk summary with the result.
 
-- Add monthly and quarterly performance reports to portfolio backtests.
-- Add equity curve CSV output.
-- Add rolling 3-month drawdown and rolling 6-month return analysis.
-- Compare max same-side position limit 1 vs 2 across multiple symbol sets.
-- Compare monthly loss controls: reduce at -4/-6/-8%, stop at -8/-10/-12%.
+Do not start a second hypothesis in the same run unless the first one required no code change and finished quickly.
 
-### Priority 2: Symbol Universe Expansion
+## Acceptance Rules
 
-- Test additional liquid futures symbols: ADA, DOGE, AVAX, LINK, LTC, BCH, NEAR, SUI.
-- Exclude symbols with too little history or unstable listing periods.
-- Rank symbols by standalone PF, MDD, trade count, and contribution to portfolio diversification.
-- Test top 5, top 8, top 10 symbol portfolios.
+A change can be marked accepted only when it improves at least one important weakness without creating a larger new weakness.
 
-### Priority 3: Trend-Following Variants
+Balanced mode acceptance:
 
-- Donchian breakout lookbacks: 10, 20, 40, 60.
-- EMA filters: EMA20/EMA100, EMA50/EMA200, close above/below EMA200.
-- ADX thresholds: 15, 20, 25, 30.
-- ATR stop/target pairs: 1.5/3, 2/3, 2/4, 2.5/5.
-- Time exits: 3 days, 4 days, 6 days, 10 days.
+- Monthly compound remains near or above 5.0%.
+- Max drawdown stays below 30%.
+- Worst month stays better than -15%.
+- Profit factor stays above 1.35.
+- Trade count stays above 100.
+- No single symbol explains most of the improvement.
 
-### Priority 4: Trailing Exit Research
+Stable mode acceptance:
 
-- After 1R profit, move stop to breakeven.
-- After 2R profit, trail with EMA20 or ATR channel.
-- Partial exit at 2R and trail the rest.
+- Monthly compound remains near or above 4.0%.
+- Max drawdown improves versus the balanced baseline or stays below 22%.
+- Worst month stays better than -14%.
+- Month win rate stays near or above 65%.
+- Profit factor stays above 1.35.
+
+Aggressive mode acceptance:
+
+- Monthly compound can target 7% to 9%.
+- Max drawdown must be reported clearly and should stay below 45%.
+- Aggressive mode must stay opt-in and must not replace the live default automatically.
+
+Reject a change when:
+
+- It only improves total return by increasing drawdown sharply.
+- It reduces trade count below 100 without a clear satellite-strategy reason.
+- It depends on one symbol, one year, or one unusually strong month.
+- It makes logs, configuration, or live operation harder to understand.
+- It requires exchange API keys or automated order placement.
+
+## Priority Queue
+
+### P1: Monthly Loss Defense
+
+Hypothesis: the system can keep most upside while reducing weak-month damage.
+
+Tasks:
+
+- Compare monthly reduce levels: -4%, -6%, -8%, -10%.
+- Compare monthly stop levels: -8%, -10%, -12%, -15%.
+- Report return, MDD, worst month, month win rate, and trade count.
+- Prefer rules that reduce worst month without killing monthly compound.
+
+Decision target:
+
+- Find one balanced setting and one stable setting worth documenting.
+
+### P2: Symbol Contribution Pruning
+
+Hypothesis: removing weak symbols can improve portfolio stability.
+
+Tasks:
+
+- Generate symbol-level PF, MDD, trade count, and contribution reports.
+- Test portfolios that exclude the worst one or two symbols.
+- Test top 3, top 4, and top 5 symbol sets by robust contribution.
+- Check that removed symbols are not useful diversifiers during bad BTC periods.
+
+Decision target:
+
+- Keep the current 5-symbol universe unless pruning improves drawdown or PF without overfitting.
+
+### P3: Volatility Regime Filter
+
+Hypothesis: avoiding extreme volatility periods reduces drawdown and false breakouts.
+
+Tasks:
+
+- Compare no filter, skip top 5% ATR percentile, skip top 10%, and reduce risk in top 10%.
+- Check whether volatility filters help both long and short trades.
+- Compare against the stable alternative that already uses `skip_extreme`.
+
+Decision target:
+
+- Decide whether `BOT_VOL_FILTER=skip_extreme` should remain conservative-only or become live default.
+
+### P4: Same-Side and Exposure Limits
+
+Hypothesis: portfolio-level exposure caps can reduce correlated losses.
+
+Tasks:
+
+- Compare max same-side 1 vs 2.
+- Compare max total exposure 2x, 3x, 4x, 5x.
+- Compare max position fraction 1.0x, 1.5x, 2.0x.
+- Report drawdown improvement per unit of return sacrificed.
+
+Decision target:
+
+- Preserve max same-side 1 unless evidence strongly supports wider exposure.
+
+### P5: Exit Logic Improvements
+
+Hypothesis: exits can improve PF and reduce reversals after open profit.
+
+Tasks:
+
+- Test breakeven stop after 1R.
+- Test ATR trailing stop after 2R.
+- Test EMA20 trailing stop after 2R.
+- Test partial exit at 2R with trailing remainder.
 - Compare fixed target vs trailing target.
 
-### Priority 5: Regime and Correlation Filters
+Decision target:
 
-- BTC daily bull/bear regime filter.
-- Crypto market breadth filter using number of symbols above EMA200.
-- High-volatility risk reduction using ATR percentile.
-- Correlation cluster exposure limits.
+- Accept only if PF or drawdown improves without major trade-count collapse.
 
-### Priority 6: Stock Market Foundation
+### P6: Breakout and Trend Variants
 
-- Design a stock-compatible strategy module using daily data first.
-- Start with ETFs before individual stocks: SPY, QQQ, IWM, GLD, TLT.
-- Add stock-specific rules for gaps, earnings dates, market sessions, and overnight risk.
-- Keep stock research separate from crypto futures until both are independently validated.
+Hypothesis: current Donchian 10 / EMA50-200 / ADX20 setup may not be the most robust.
 
-### Priority 7: Korea Stock Market Foundation
+Tasks:
 
-- Identify reliable KOSPI/KOSDAQ index or ETF data sources.
-- Start with KOSPI 200 and KOSDAQ 150 style exposure.
-- Add liquidity and gap filters before testing individual stocks.
-- Build reports that compare strategy returns with the relevant Korean benchmark.
+- Donchian lookbacks: 10, 20, 40, 60.
+- EMA filters: EMA20/100, EMA50/200, close above/below EMA200.
+- ADX thresholds: 15, 20, 25, 30.
+- ATR stop/target pairs: 1.5/3, 2/3, 2/4, 2.5/5.
+- Time exits: 18, 24, 36, 60 four-hour bars.
 
-### Priority 8: GitHub Progress Hygiene
+Decision target:
 
-- Keep `DAILY_UPDATE_LOG.md` updated after every meaningful change.
-- Keep `RESULTS_SUMMARY.md` focused on validated results only.
-- Keep `PROJECT_ROADMAP.md` as the high-level direction.
-- Keep code filenames descriptive enough that their purpose is obvious from GitHub.
+- Avoid changing the live signal unless the improvement is broad across metrics.
+
+### P7: Symbol Universe Expansion
+
+Hypothesis: adding liquid coins can improve diversification and opportunity count.
+
+Tasks:
+
+- Test ADA, DOGE, AVAX, LINK, LTC, BCH, NEAR, SUI.
+- Exclude symbols with short or unstable history.
+- Rank each by standalone quality and portfolio contribution.
+- Test top 5, top 8, and top 10 portfolios.
+
+Decision target:
+
+- Add symbols only when they improve stability, not just trade count.
+
+### P8: Walk-Forward and Out-of-Sample Checks
+
+Hypothesis: accepted settings should survive simple time splits.
+
+Tasks:
+
+- Split 2023, 2024, 2025, and 2026-to-date.
+- Test rolling train/test windows when enough data exists.
+- Compare chosen candidates against naive parameter neighbors.
+- Flag any result that only works in one year.
+
+Decision target:
+
+- Promote only candidates that are not obviously one-period artifacts.
+
+### P9: Stock System Foundation
+
+Hypothesis: a separate stock ETF system can diversify away from crypto-only risk.
+
+Tasks:
+
+- Build daily-data ETF backtest foundation for SPY, QQQ, IWM, GLD, TLT.
+- Add benchmark comparison.
+- Track turnover, exposure percentage, drawdown, and annualized return.
+- Keep this separate from crypto futures research.
+
+Decision target:
+
+- Produce first stock baseline before individual-stock research.
+
+### P10: Korea Stock Foundation
+
+Hypothesis: Korean ETF/index research can become a separate regional strategy.
+
+Tasks:
+
+- Identify reliable KOSPI 200 and KOSDAQ 150 data sources.
+- Build a basic daily trend-following benchmark comparison.
+- Add liquidity and gap-risk notes before individual-stock tests.
+
+Decision target:
+
+- Do not mix Korean stock assumptions into the crypto or US ETF system.
+
+## Live Default Protection
+
+The automation may research any queue item, but it must not silently change live defaults.
+
+Allowed automatically:
+
+- Add research scripts.
+- Add reports.
+- Add config options disabled by default.
+- Document accepted candidates.
+- Improve logging, health checks, and notifications.
+
+Requires explicit user approval:
+
+- Change `.env.example` live default risk above 3%.
+- Change live symbols.
+- Change live stop/target or signal defaults.
+- Add exchange API keys.
+- Add automated order placement.
 
 ## Next Automatic Task
 
-Start with Priority 1. Improve the crypto research reports so every later experiment is easier to judge. Then begin Priority 6 with a separate stock backtest foundation.
+Start with P1 monthly loss defense unless it is already complete for the current baseline. If P1 is complete, continue to P2 symbol contribution pruning.

@@ -7,6 +7,23 @@ Every manual or automatic update should add a new entry at the top.
 ## 2026-09-13
 
 Focus:
+- Rebuild the automatic update backlog into a profitability improvement loop.
+
+Changed:
+- Rewrote `AUTO_UPDATE_BACKLOG.md` around daily hypotheses, acceptance rules, rejection rules, and live-default protection.
+- Fixed the balanced and stable crypto baselines as comparison anchors for future automatic research.
+- Prioritized the next automatic work as monthly loss defense, then symbol contribution pruning.
+
+Current status:
+- The daily automation now has clearer instructions for selecting, testing, accepting, rejecting, and reporting strategy improvements.
+- Live default changes still require explicit user approval.
+
+Next:
+- Let the next daily automation start with P1 monthly loss defense, or run it manually if immediate research is needed.
+
+## 2026-09-13 Earlier
+
+Focus:
 - Add KakaoTalk access token auto-refresh support.
 
 Changed:
