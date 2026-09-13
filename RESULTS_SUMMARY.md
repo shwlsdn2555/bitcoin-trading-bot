@@ -77,6 +77,33 @@ Interpretation:
 - It gives up return compared with the live candidate, but improves historical MDD from about -23.0% to about -19.9%.
 - It is suitable as a conservative mode candidate, not yet a replacement for the live default.
 
+## P1 Monthly Loss Defense Research
+
+Test:
+- Compared monthly risk-reduction and monthly stop levels for the balanced and stable profiles.
+- Reduce levels tested: -4%, -6%, -8%, -10%.
+- Stop levels tested: -8%, -10%, -12%, -15%.
+
+Balanced result:
+- Current balanced baseline remains the preferred balanced setting.
+- Baseline controls: reduce at -6%, stop at -10%.
+- Reference metrics: monthly compound about 6.00%, MDD about -23.02%, worst month about -10.52%, 357 trades, PF about 1.48.
+- More defensive settings improved worst month in some cases, but gave up too much monthly compound, profit factor, or drawdown quality.
+
+Stable candidate result:
+- Candidate controls: reduce at -6%, stop at -8%.
+- Monthly compound: about 4.36%, versus stable baseline about 4.40%.
+- Max drawdown: about -19.85%, about unchanged.
+- Worst month: about -8.69%, improved from about -12.18%.
+- Month win rate: about 73.0%, improved from about 70.3%.
+- Trades: 334, versus 338 baseline.
+- Profit factor: about 1.46, slightly above the stable baseline.
+
+Interpretation:
+- For balanced growth, no live default change is recommended.
+- For stable mode, reduce at -6% and stop at -8% is an accepted research candidate because it meaningfully improves worst-month damage with only a small monthly return sacrifice.
+- Before live use, this stable candidate should go through walk-forward or year-by-year checks.
+
 ## Important Notes
 
 - This is not a guarantee of future performance.

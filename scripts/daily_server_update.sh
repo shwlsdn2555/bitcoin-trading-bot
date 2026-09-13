@@ -82,6 +82,11 @@ Log: $LOG_FILE"
     ./venv/bin/python risk_research_backtest.py || echo "[$STAMP] risk_research_backtest.py failed"
   fi
 
+  if [ -x ./venv/bin/python ] && [ -f monthly_loss_defense_research.py ]; then
+    echo "[$STAMP] Running monthly loss defense research"
+    ./venv/bin/python monthly_loss_defense_research.py || echo "[$STAMP] monthly_loss_defense_research.py failed"
+  fi
+
   if systemctl list-unit-files alert-bot.service >/dev/null 2>&1; then
     systemctl restart alert-bot
     systemctl is-active alert-bot

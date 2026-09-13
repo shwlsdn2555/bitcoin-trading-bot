@@ -7,6 +7,36 @@ Every manual or automatic update should add a new entry at the top.
 ## 2026-09-13
 
 Focus:
+- Run P1 monthly loss defense research manually.
+
+Hypothesis:
+- Tighter monthly reduce/stop thresholds may reduce weak-month damage without sacrificing too much return.
+
+Changed:
+- Added `monthly_loss_defense_research.py`.
+- Updated `scripts/daily_server_update.sh` so the Vultr daily update runs the monthly loss defense research when available.
+- Updated `RESULTS_SUMMARY.md` with the P1 result.
+- Updated `README.md` to list the new research script.
+
+Backtest:
+- Ran `monthly_loss_defense_research.py` locally using the existing 4H crypto data.
+- Output files written under ignored `risk_research_results/`.
+
+Decision:
+- Balanced mode: keep current reduce -6% / stop -10% baseline.
+- Stable mode: accepted candidate reduce -6% / stop -8% for further validation.
+
+Metrics:
+- Balanced baseline: monthly compound about 6.00%, MDD about -23.02%, worst month about -10.52%, 357 trades, PF about 1.48.
+- Stable candidate: monthly compound about 4.36%, MDD about -19.85%, worst month about -8.69%, 334 trades, PF about 1.46.
+- Stable candidate improved worst month from about -12.18% to about -8.69% with only a small monthly return sacrifice.
+
+Next:
+- Run walk-forward or year-by-year checks for the stable monthly loss defense candidate before any live default change.
+
+## 2026-09-13 Earlier
+
+Focus:
 - Rebuild the automatic update backlog into a profitability improvement loop.
 
 Changed:
