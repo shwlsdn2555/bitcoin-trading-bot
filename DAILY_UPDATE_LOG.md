@@ -7,6 +7,27 @@ Every manual or automatic update should add a new entry at the top.
 ## 2026-09-13
 
 Focus:
+- Document the confirmed lower-drawdown crypto candidate from the improved risk research output.
+
+Changed:
+- Updated `RESULTS_SUMMARY.md` with a stable alternative candidate.
+- Compared the current live candidate against the lower-drawdown candidate.
+- Added live bot support for `BOT_VOL_FILTER=skip_extreme` so the stable candidate can be configured from `.env`.
+
+Confirmed metrics:
+- Current live candidate: monthly compound about 6.0%, MDD about -23.0%, 357 trades, profit factor about 1.48.
+- Stable alternative: monthly compound about 4.40%, MDD about -19.85%, 338 trades, profit factor about 1.46.
+
+Current status:
+- The live default remains the balanced growth candidate.
+- The stable alternative is now documented as a conservative mode candidate.
+
+Next:
+- Add a config switch or `.env` preset so the live bot can run either balanced growth mode or stable mode without manual parameter confusion.
+
+## 2026-09-13 Earlier
+
+Focus:
 - Start Priority 1 from the research backlog: improve crypto portfolio reporting.
 
 Changed:

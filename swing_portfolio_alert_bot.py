@@ -47,6 +47,7 @@ MAX_POSITION_FRACTION = float(os.getenv("BOT_MAX_POSITION_FRACTION", "1.5"))
 MAX_TOTAL_EXPOSURE = float(os.getenv("BOT_MAX_TOTAL_EXPOSURE", "3.0"))
 MONTHLY_REDUCE_AT = float(os.getenv("BOT_MONTHLY_REDUCE_AT", "-0.06"))
 MONTHLY_STOP_AT = float(os.getenv("BOT_MONTHLY_STOP_AT", "-0.10"))
+VOL_FILTER = os.getenv("BOT_VOL_FILTER", "none").strip().lower()
 
 STABLE_RISK_PCT = float(os.getenv("BOT_STABLE_RISK_PCT", "0.015"))
 AGGRESSIVE_RISK_PCT = float(os.getenv("BOT_AGGRESSIVE_RISK_PCT", "0.04"))
@@ -183,6 +184,7 @@ def fetch_df(exchange, symbol, limit=260):
     df["ema200"] = ema(df["close"], 200)
     df["atr14"] = atr(df, 14)
     df["adx14"] = adx(df, 14)
+    df["atr_pctile"] = df["atr14"].rolling(180).rank(pct=True)
     return df.dropna().reset_index(drop=True)
 
 
@@ -257,6 +259,10 @@ def build_signal(exchange, symbol, state):
     else:
         stop = entry + atr_price * STOP_ATR_MULT
         target = entry - atr_price * TARGET_ATR_MULT
+    atr_pctile = float(sig.get("atr_pctile", 0.0))
+    if VOL_FILTER == "skip_extreme" and atr_pctile >= 0.95:
+        log_event("INFO", "signal_blocked", f"{signal_key} extreme volatility filter atr_pctile={atr_pctile:.2f}")
+        return None
     stop_pct = abs(entry - stop) / entry
     risk_pct, risk_reason = projected_monthly_risk(state)
     if risk_pct <= 0:
@@ -282,6 +288,7 @@ def build_signal(exchange, symbol, state):
         "target": target,
         "stop_pct": stop_pct,
         "atr": atr_price,
+        "atr_pctile": atr_pctile,
         "adx": float(sig["adx14"]),
         "ema50": float(sig["ema50"]),
         "ema200": float(sig["ema200"]),
@@ -306,7 +313,7 @@ def send_signal(signal):
         f"Target: {fmt_price(signal['target'])} (R:R {(TARGET_ATR_MULT / STOP_ATR_MULT):.2f})\n"
         f"Max hold: {MAX_HOLD_BARS} candles (~{hold_days:.1f} days)\n"
         f"ADX: {signal['adx']:.1f}\n"
-        f"ATR: {fmt_price(signal['atr'])}\n"
+        f"ATR: {fmt_price(signal['atr'])} / percentile {signal['atr_pctile']:.0%}\n"
         f"Default risk: {signal['risk_pct']:.2%} ({signal['risk_reason']})\n"
         f"Default notional: {signal['position_fraction']:.2f}x equity\n"
         f"Stable mode: risk {STABLE_RISK_PCT:.2%}, notional {signal['stable_fraction']:.2f}x\n"
