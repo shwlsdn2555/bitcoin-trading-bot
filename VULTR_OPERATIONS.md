@@ -56,12 +56,21 @@ scripts/daily_server_update.sh
 
 It does this:
 
+- Sends a KakaoTalk start notice when `KAKAO_NOTIFY_ENABLED=true`.
 - Pulls the latest GitHub code when server Git authentication is available.
 - Continues with the files currently on the server if GitHub pull fails.
 - Installs updated Python requirements.
 - Runs available crypto research backtests.
 - Restarts the alert bot.
+- Sends a KakaoTalk finish or failure notice with the latest log summary.
 - Writes logs to `/opt/alert-bot/logs/server_daily_update.log`.
+
+KakaoTalk notices require these values in `/opt/alert-bot/.env`:
+
+```text
+KAKAO_NOTIFY_ENABLED=true
+KAKAO_ACCESS_TOKEN=your_kakao_access_token
+```
 
 ## Cron Setup
 

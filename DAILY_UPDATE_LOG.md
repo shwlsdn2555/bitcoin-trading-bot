@@ -7,6 +7,23 @@ Every manual or automatic update should add a new entry at the top.
 ## 2026-09-13
 
 Focus:
+- Connect Vultr daily server cron to KakaoTalk start/end notifications.
+
+Changed:
+- Updated `scripts/daily_server_update.sh` to send a start notice before the server update.
+- Added finish/failure KakaoTalk notices with service status and recent log lines.
+- Updated `VULTR_OPERATIONS.md` with the required Kakao `.env` values.
+
+Current status:
+- Manual KakaoTalk test from the Vultr server succeeded.
+- The daily server cron can now notify when it starts and when it finishes after the updated script is pulled to Vultr.
+
+Next:
+- Push this commit, pull it on Vultr, and run one manual daily update test.
+
+## 2026-09-13 Earlier
+
+Focus:
 - Prepare KakaoTalk start/end notifications for daily quant updates.
 
 Changed:
